@@ -4,6 +4,7 @@ from datetime import datetime
 class Place(BaseModel):
     def __init__(self, title, description, price, latitude, longitude, owner):
         super().__init__()
+        self.id = str(uuid.uuid4())
         self.title = title
         self.description = description
         self.price = price
