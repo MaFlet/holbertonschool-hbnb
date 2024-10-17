@@ -3,6 +3,9 @@ from app.models.basemodel import BaseModel
 class User(BaseModel):
     """"""
     def __init__(self, f_name, l_name, i_email, admin=False) -> None:
+        if f_name is None or l_name is None or i_email is None:
+            raise ValueError("Required Attributes not specified")
+
         super.__init__()
         self.first_name = f_name
         self.last_name = l_name
