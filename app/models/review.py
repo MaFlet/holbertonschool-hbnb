@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime
 
-class Amenity(Place):
-    def __init__(self, text, rating, place, user):
+class Review(Place):
+    def __init__(self, id, text, rating, place, user):
         super().__init__()
         self.id = str(uuid.uuid4())
         self.text = text
