@@ -1,17 +1,19 @@
-import uuid
-from datetime import datetime
 from app.models.basemodel import BaseModel
 
 class User(BaseModel):
     """"""
-    def __init__(self) -> None:
-        self.first_name = ""
-        self.last_name = ""
-        self.email = ""
-        self.is_admin = False
+    def __init__(self, f_name, l_name, i_email, admin=False) -> None:
+        super.__init__()
+        self.first_name = f_name
+        self.last_name = l_name
+        self.email = i_email
+        self.is_admin = admin
 
         pass
 
+    def update_email(self, newEmail):
+        self.email = newEmail
+        self.save()
 # functions that can be put into the basemodel,
 # if implemented.
 #
