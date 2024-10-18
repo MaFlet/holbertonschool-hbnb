@@ -13,5 +13,7 @@ user_model = api.model('User', {
 facade = HBnBFacade()
 
 @api.route('/')
-def get():
-    return "Hello World"
+class UserList(Resource):
+
+    def get(self):
+        return "Hello World"
