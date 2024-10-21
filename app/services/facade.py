@@ -4,7 +4,14 @@ from app.models.user import User
 class HBnBFacade:
     def __init__(self):
         self.user_repo = InMemoryRepository()
+        self.amenity_repo = InMemoryRepository()
+        self.place_repo = InMemoryRepository()
+        self.review_repo = InMemoryRepository()
 
+
+    ###
+    ###USER
+    ###
     # Placeholder method for creating a user
     def create_user(self, user_data):
         user = User(**user_data)
@@ -16,3 +23,23 @@ class HBnBFacade:
     
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
+    
+    ###
+    ###AMENITY
+    ###
+
+    def create_amenity(self, amenity_data):
+    # Placeholder for logic to create an amenity
+        pass
+
+    def get_amenity(self, amenity_id):
+    # Placeholder for logic to retrieve an amenity by ID
+        pass
+
+    def get_all_amenities(self):
+    # Placeholder for logic to retrieve all amenities
+        pass
+
+    def update_amenity(self, amenity_id, amenity_data):
+    # Placeholder for logic to update an amenity
+        pass
