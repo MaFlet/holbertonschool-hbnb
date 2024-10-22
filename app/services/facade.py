@@ -63,23 +63,34 @@ class HBnBFacade:
     ###
 
     def create_place(self, place_data):
-    # Placeholder for logic to create a place, including validation for price, latitude, and longitude
-        new_place = Place(**place_data)
-        self.place_repo.add(new_place)
-        return new_place
+        place = Place(**place_data)
+        self.place_repo.add(place)
+        return place
 
     def get_place(self, place_id):
-    # Placeholder for logic to retrieve a place by ID, including associated owner and amenities
-        pass
+        return self.amenity_repo.get(place_id)
 
     def get_all_places(self):
-    # Placeholder for logic to retrieve all places
         return self.place_repo.get_all()
-        pass
 
     def update_place(self, place_id, place_data):
-    # Placeholder for logic to update a place
-        pass
+        place = self.get_place(place_id)
+        if place is None:
+            return None
+    
+        if 'owner_id' in place_data:
+            owner = self.get_user(place_data['owner_id'])
+            if owner is None:
+                raise ValueError('Invalid owner_id')
+            
+        if 'amenities' in place_data:
+            for amenity_id in place_data['amenities']:
+                if self.amenity_repo.get(amenity_id) is None:
+                    raise ValueError(f'Invalid amenity_id: {amenity_id}')
+                
+        place.update(place_data)
+        return place
+    
 
     ###
     ###REVIEW

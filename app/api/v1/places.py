@@ -74,30 +74,26 @@ class PlaceResource(Resource):
         if owner is None:
             return {'error': 'Owner information not found'}, 404
         amenities = facade.get_place_amenities(place_id)
+
         return {
-            'place_id': str(place.place_id),
+            'id': place.id,
             'title': place.title, 
             'description': place.description, 
             'price': place.price, 
             'latitude': place.latitude, 
             'longitude': place.longtitude,
             'owner': {
-                'owner_id': str(place.owner_id),
-                'first_name': place.first_name,
-                'last_name': place.last_name,
-                'email': place.email
+                'id': owner.id,
+                'first_name': owner.first_name,
+                'last_name': owner.last_name,
+                'email': owner.email
             },
             'amenities': [
                 {
-                    'id': place.id,
-                    'name': place.name
-                },
-                {
-                    'id': place.id,
-                    'name': place.id
-                }
-            ]
-        }
+                    'id': amenity.id,
+                    'name': amenity.name
+                } for amenity in amenities]
+        }, 200
 
     @api.expect(place_model)
     @api.response(200, 'Place updated successfully')
@@ -111,6 +107,8 @@ class PlaceResource(Resource):
             return {'error': 'Amenity not found.'}, 404
         return {
             'message': 'Place updated successfully',
-            'id': str(updated_place.id),
-            'name': updated_place.name
+            'id': updated_place.id,
+            'title': updated_place.title,
+            'description': updated_place.description,
+            'price': updated_place.price,
         }, 200
