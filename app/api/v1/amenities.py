@@ -1,3 +1,4 @@
+from uuid import UUID
 from flask_restx import Namespace, Resource, fields
 from app.services.facade import HBnBFacade
 
@@ -18,9 +19,6 @@ class AmenityList(Resource):
     def post(self):
         """Register a new amenity"""
         amenity_data = api.payload
-
-        #existing_amenity = facade.get_amenity()
-        #Checking for existing amenity ^^^
 
         new_amenity = facade.create_amenity(amenity_data)
 
