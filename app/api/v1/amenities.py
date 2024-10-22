@@ -37,18 +37,14 @@ class AmenityResource(Resource):
     @api.response(404, 'Amenity not found')
     def get(self, amenity_id):
         """Get amenity details by ID"""
-        try:
-            amenity_id = UUID(str(amenity_id))
-            amenity = facade.get_amenity(amenity_id)
+        amenity = facade.get_amenity(amenity_id)
 
-            if amenity is None:
-                    return {'error': 'Amenity not found'}, 404
-            return {
-                'id': str(amenity.id),
-                'name':amenity.name
-            }, 200
-        except ValueError:
-            return {'error': 'Invalid amenity ID format'}, 400
+        if amenity is None:
+            return {'error': 'Amenity not found'}, 404
+        return {
+            'id': str(amenity.id),
+            'name':amenity.name
+        }, 200
 
     @api.expect(amenity_model)
     @api.response(200, 'Amenity updated successfully')
@@ -56,17 +52,13 @@ class AmenityResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, amenity_id):
         """Update an amenity's information"""
-        try:
-            amenity_data = api.payload
-            amenity_id = UUID(str(amenity_id))
+        amenity_data = api.payload
 
-            updated_amenity = facade.update_amenity(amenity_id, amenity_data)
-            if updated_amenity is None:
-                return {'error': 'Amenity not found.'}, 404
-            return {
-                'message': 'Amenity updated successfully',
-                'id': str(updated_amenity.id),
-                'name': updated_amenity.name
-            }, 200
-        except ValueError:
-            return {'error': 'Invalid amenity ID format'}, 400
+        updated_amenity = facade.update_amenity(amenity_id, amenity_data)
+        if updated_amenity is None:
+            return {'error': 'Amenity not found.'}, 404
+        return {
+            'message': 'Amenity updated successfully',
+            'id': str(updated_amenity.id),
+            'name': updated_amenity.name
+        }, 200

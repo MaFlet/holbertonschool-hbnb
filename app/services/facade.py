@@ -52,9 +52,10 @@ class HBnBFacade:
         amenity = self.get_amenity(amenity_id)
         if amenity is None:
             return None
-        for key, value in amenity_data.items():
-            if hasattr(amenity, key):
-                setattr(amenity, key, value)
+        #for key, value in amenity_data.items():
+            #if hasattr(amenity, key):
+                #setattr(amenity, key, value)
+        amenity.update(amenity_data)
         return amenity
 
     ###
