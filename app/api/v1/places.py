@@ -76,21 +76,21 @@ class PlaceResource(Resource):
         amenities = facade.get_place_amenities(place_id)
 
         return {
-            'id': place.id,
+            'id': str(place.id),
             'title': place.title, 
             'description': place.description, 
             'price': place.price, 
             'latitude': place.latitude, 
             'longitude': place.longtitude,
             'owner': {
-                'id': owner.id,
+                'id': str(owner.id),
                 'first_name': owner.first_name,
                 'last_name': owner.last_name,
                 'email': owner.email
             },
             'amenities': [
                 {
-                    'id': amenity.id,
+                    'id':str(amenity.id),
                     'name': amenity.name
                 } for amenity in amenities]
         }, 200
@@ -107,7 +107,7 @@ class PlaceResource(Resource):
             return {'error': 'Amenity not found.'}, 404
         return {
             'message': 'Place updated successfully',
-            'id': updated_place.id,
+            'id':str(updated_place.id),
             'title': updated_place.title,
             'description': updated_place.description,
             'price': updated_place.price,
