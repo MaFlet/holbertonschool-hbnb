@@ -1,3 +1,4 @@
+from uuid import UUID
 from app.persistence.repository import InMemoryRepository
 from app.models.user import User
 from app.models.amenity import Amenity
@@ -38,19 +39,23 @@ class HBnBFacade:
         return amenity
 
     def get_amenity(self, amenity_id):
-    # Placeholder for logic to retrieve an amenity by ID
-        pass
+        #amenity_id = UUID(str(amenity_id))
+        return self.amenity_repo.get(amenity_id)
 
     def get_amenity_by_name(self, amenity_name):
         return self.amenity_repo.get_by_attribute("name", amenity_name)
 
     def get_all_amenities(self):
-    # Placeholder for logic to retrieve all amenities
-        pass
+        return list(self.amenity_repo.get_all())
 
     def update_amenity(self, amenity_id, amenity_data):
-    # Placeholder for logic to update an amenity
-        pass
+        amenity = self.get_amenity(amenity_id)
+        if amenity is None:
+            return None
+        for key, value in amenity_data.items():
+            if hasattr(amenity, key):
+                setattr(amenity, key, value)
+        return amenity
 
     ###
     ###PLACE
