@@ -16,7 +16,6 @@ class HBnBFacade:
     ###
     ###USER
     ###
-    # Placeholder method for creating a user
     def create_user(self, user_data):
         user = User(**user_data)
         self.user_repo.add(user)
@@ -63,6 +62,19 @@ class HBnBFacade:
     ###
 
     def create_place(self, place_data):
+        owner_id = place_data.get('owner_id')
+        if not self.get_user(owner_id):
+            raise ValueError(f'Invalid ownwe_id: {owner_id}')
+        
+        if 'amenities' in place_data:
+            valid_amenities = []
+            for amenity_id in place_data['amenities']:
+                amenity = self.get_amenity(amenity_id)
+                if not amenity:
+                    raise ValueError(f'Invalid amenity_id: {amenity_id}')
+                valid_amenities.append(amenity)
+            place_data['amenities'] = valid_amenities
+
         place = Place(**place_data)
         self.place_repo.add(place)
         return place
@@ -71,55 +83,78 @@ class HBnBFacade:
         return self.place_repo.get(place_id)
 
     def get_all_places(self):
-        return self.place_repo.get_all()
+        return list(self.place_repo.get_all())
 
     def update_place(self, place_id, place_data):
-        return self.place_repo.update(place_id, place_data)
-        #place = self.get_place(place_id)
-        #if place is None:
-            #return None
+        place = self.get_place(place_id)
+        if place is None:
+            raise ValueError(f"Place with ID {place_id} not found")
     
-        #if 'owner_id' in place_data:
-            #owner = self.get_user(place_data['owner_id'])
-            #if owner is None:
-                #raise ValueError('Invalid owner_id')
+        if 'owner_id' in place_data:
+            owner = self.get_user(place_data['owner_id'])
+            if owner is None:
+                raise ValueError(f"Invalid owner_id: {place_id['owner_id']}")
             
-        #if 'amenities' in place_data:
-            #for amenity_id in place_data['amenities']:
-                #if self.amenity_repo.get(amenity_id) is None:
-                    #raise ValueError(f'Invalid amenity_id: {amenity_id}')
+        if 'amenities' in place_data:
+            valid_amenities = []
+            for amenity_id in place_data['amenities']:
+                amenity = self.get_amenity(amenity_id)
+                if not amenity:
+                    raise ValueError(f"Invalid amenity_id: {amenity_id}")
+                valid_amenities.append(amenity)
+            place_data['amenities'] = valid_amenities
                 
-        #place.update(place_data)
-        #return place
-    
+        return self.place_repo.update(place_id, place_data)
 
     ###
     ###REVIEW
     ###
 
     def create_review(self, review_data):
-    # Placeholder for logic to create a review, including validation for user_id, place_id, and rating
+        user_id = review_data.get('user_id') #validating if user exists
+        if not self.get_user(user_id):
+            raise ValueError(f"user_id did not exist: {user_id}")
+        
+        place_id = place_data.get('place_id')
+        if not self.get_place(place_id):
+            raise ValueError(f"place_id did not exist: {place_id}")
+        
+        rating = review_data.get('rating')
+        if not isinstance(rating, int) or not 1<= rating <=5:
+            raise ValueError("Rating must be an integet")
+        
         new_review = Review(**review_data)
         self.review_repo.add(new_review)
         return new_review
-        pass
 
     def get_review(self, review_id):
-    # Placeholder for logic to retrieve a review by ID
-        pass
+        return self.review_repo.get(review_id)
 
     def get_all_reviews(self):
-    # Placeholder for logic to retrieve all reviews
-        pass
+        return list(self.review_repo.get_all())
 
     def get_reviews_by_place(self, place_id):
-    # Placeholder for logic to retrieve all reviews for a specific place
-        pass
+         return self.review_repo.get_by_attribute("place_id", place_id)
 
     def update_review(self, review_id, review_data):
-    # Placeholder for logic to update a review
-        pass
-
+        review = self.get_review(review_id)
+        if review is None:
+            raise ValueError(f"Review with ID {review_id} not found")
+        
+        if 'rating' in review_data:
+            rating = review_data['rating']
+            if not isinstance(rating, int) or not 1 <= rating <= 5:
+                raise ValueError("Rating must be a number")
+            
+        return self.review_repo.update(review_id, review_data)
+    
     def delete_review(self, review_id):
-    # Placeholder for logic to delete a review
-        pass
+        if not review_id:
+            raise ValueError("Review ID cannot be empty")
+        
+        review = self.get_review(review_id)
+        if review is None:
+            raise ValueError(f"Review with ID {review_id} not found")
+        
+        return self.review_repo.delete(review_id)
+        
