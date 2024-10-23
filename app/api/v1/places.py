@@ -109,12 +109,25 @@ class PlaceResource(Resource):
             'latitude': place.latitude, 
             'longitude': place.longtitude,
             'owner': {
+<<<<<<< HEAD
                 'id': str(place.owner.id),
                 'first_name': place.owner.first_name,
                 'last_name': place.owner.last_name,
                 'email': place.owner.email
             },
             'amenities': amenities_list
+=======
+                'id': str(owner.id),
+                'first_name': owner.first_name,
+                'last_name': owner.last_name,
+                'email': owner.email
+            },
+            'amenities': [
+                {
+                    'id':str(amenity.id),
+                    'name': amenity.name
+                } for amenity in amenities]
+>>>>>>> 3b77a5671e5f5cf4916b069db087f770e2c075ff
         }, 200
 
     @api.expect(place_model)
@@ -124,6 +137,7 @@ class PlaceResource(Resource):
     def put(self, place_id):
         """Update a place's information"""
         place_data = api.payload
+<<<<<<< HEAD
         required_fields = {'title', 'description', 'price'}
 
         if set(place_data.keys()) != required_fields:
@@ -135,3 +149,15 @@ class PlaceResource(Resource):
             return {'Message': 'Place updated successfully'}, 200
         except ValueError as error:
             return {'error': f"Setter validation failure: {str(error)}"}, 400
+=======
+        updated_place = facade.update_place(place_id, place_data)
+        if updated_place is None:
+            return {'error': 'Amenity not found.'}, 404
+        return {
+            'message': 'Place updated successfully',
+            'id':str(updated_place.id),
+            'title': updated_place.title,
+            'description': updated_place.description,
+            'price': updated_place.price,
+        }, 200
+>>>>>>> 3b77a5671e5f5cf4916b069db087f770e2c075ff
