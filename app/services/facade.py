@@ -68,28 +68,29 @@ class HBnBFacade:
         return place
 
     def get_place(self, place_id):
-        return self.amenity_repo.get(place_id)
+        return self.place_repo.get(place_id)
 
     def get_all_places(self):
         return self.place_repo.get_all()
 
     def update_place(self, place_id, place_data):
-        place = self.get_place(place_id)
-        if place is None:
-            return None
+        return self.place_repo.update(place_id, place_data)
+        #place = self.get_place(place_id)
+        #if place is None:
+            #return None
     
-        if 'owner_id' in place_data:
-            owner = self.get_user(place_data['owner_id'])
-            if owner is None:
-                raise ValueError('Invalid owner_id')
+        #if 'owner_id' in place_data:
+            #owner = self.get_user(place_data['owner_id'])
+            #if owner is None:
+                #raise ValueError('Invalid owner_id')
             
-        if 'amenities' in place_data:
-            for amenity_id in place_data['amenities']:
-                if self.amenity_repo.get(amenity_id) is None:
-                    raise ValueError(f'Invalid amenity_id: {amenity_id}')
+        #if 'amenities' in place_data:
+            #for amenity_id in place_data['amenities']:
+                #if self.amenity_repo.get(amenity_id) is None:
+                    #raise ValueError(f'Invalid amenity_id: {amenity_id}')
                 
-        place.update(place_data)
-        return place
+        #place.update(place_data)
+        #return place
     
 
     ###
