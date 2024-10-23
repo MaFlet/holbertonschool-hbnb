@@ -46,31 +46,40 @@ class PlaceList(Resource):
     def post(self):
         """Register a new place"""
         place_data = api.payload
-
+        print(f"Receiving place data: {place_data}")
+        
         required_fields = ['title', 'description', 'price', 'latitude', 'longitude', 'owner_id']
         if not all(field in place_data for field in required_fields):
+            missing_fields = [field for field in required_fields if field not in place_data]
+            print(f"Missing fields: {missing_fields}")
             return {'error': "Data: invalid input"}, 400
         
         owner_id = str(place_data.get('owner_id'))
+        print(f"looking for user with ID: {owner_id}")
         user = facade.get_user(owner_id)
         if not user:
+            print(f"Searched for user with ID: {owner_id}")
             return {'error': "User does not exist"}, 400
+        
+        new_place = None
         try:
             place_data['owner'] = user
             del place_data['owner_id']
-            new_place = facade.create_place(place_data)
 
-            return { 
-                'id': str(new_place.id),
-                'title': new_place.title, 
-                'description': new_place.description, 
-                'price': new_place.price, 
-                'latitude': new_place.latitude, 
-                'longitude': new_place.longtitude, 
-                'owner_id': new_place.owner.id 
-            }, 201
+            new_place = facade.create_place(place_data)
         except ValueError as error:
             return {'error': f"Setter validation failure: {str(error)}"}, 400
+        
+        result = { 
+            'id': str(new_place.id),
+            'title': new_place.title, 
+            'description': new_place.description, 
+            'price': new_place.price, 
+            'latitude': new_place.latitude, 
+            'longitude': new_place.longitude, 
+            'owner_id': str(new_place.owner.id) 
+            }
+        return result, 201
 
 
     @api.response(200, 'List of places retrieved successfully')
@@ -91,7 +100,7 @@ class PlaceResource(Resource):
         """Get place details by ID"""
         place = facade.get_place(place_id)
         if not place:
-            return{'error': 'Amenity not found'}, 404
+            return{'error': 'Place not found'}, 404
         if not place.owner:
             return {'error': 'Owner information not found'}, 404
 
@@ -109,25 +118,12 @@ class PlaceResource(Resource):
             'latitude': place.latitude, 
             'longitude': place.longtitude,
             'owner': {
-<<<<<<< HEAD
                 'id': str(place.owner.id),
                 'first_name': place.owner.first_name,
                 'last_name': place.owner.last_name,
                 'email': place.owner.email
             },
             'amenities': amenities_list
-=======
-                'id': str(owner.id),
-                'first_name': owner.first_name,
-                'last_name': owner.last_name,
-                'email': owner.email
-            },
-            'amenities': [
-                {
-                    'id':str(amenity.id),
-                    'name': amenity.name
-                } for amenity in amenities]
->>>>>>> 3b77a5671e5f5cf4916b069db087f770e2c075ff
         }, 200
 
     @api.expect(place_model)
@@ -137,7 +133,6 @@ class PlaceResource(Resource):
     def put(self, place_id):
         """Update a place's information"""
         place_data = api.payload
-<<<<<<< HEAD
         required_fields = {'title', 'description', 'price'}
 
         if set(place_data.keys()) != required_fields:
@@ -149,15 +144,3 @@ class PlaceResource(Resource):
             return {'Message': 'Place updated successfully'}, 200
         except ValueError as error:
             return {'error': f"Setter validation failure: {str(error)}"}, 400
-=======
-        updated_place = facade.update_place(place_id, place_data)
-        if updated_place is None:
-            return {'error': 'Amenity not found.'}, 404
-        return {
-            'message': 'Place updated successfully',
-            'id':str(updated_place.id),
-            'title': updated_place.title,
-            'description': updated_place.description,
-            'price': updated_place.price,
-        }, 200
->>>>>>> 3b77a5671e5f5cf4916b069db087f770e2c075ff
