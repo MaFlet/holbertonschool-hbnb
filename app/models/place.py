@@ -3,14 +3,14 @@ from datetime import datetime
 
 class Place():
     """ """
-    def __init__(self, title, description, price, latitude, longitude, owner_id, amenities=None):
+    def __init__(self, title, description, price, latitude, longitude, owner, amenities=None):
         self.id = str(uuid.uuid4())
         self.title = title
         self.description = description
         self.price = price
         self.latitude = latitude
         self.longtitude = longitude
-        self.owner_id = owner_id
+        self.owner = owner
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
         self.reviews = []
@@ -53,7 +53,7 @@ class Place():
             self._price = float_value
         except (TypeError, ValueError) as e:
             if isinstance(e, TypeError) or str(e) != "Price cannot be negative":
-                raise ValueError("The price must be a valid number")
+                raise ValueError("The price must be a valid number", e)
             raise
 
     @property
@@ -81,60 +81,23 @@ class Place():
         self._longitude = float(value)
 
     @property
-    def owner_id(self):
+    def owner(self):
         return self._owner_id
     
-    @owner_id.setter
-    def owner_id(self, value):
-        if not isinstance(value, str):
-            raise TypeError("Owner ID must be a string")
-        try:
-            uuid.UUID(value.strip())
-            self._owner_id = value.strip()
-        except ValueError:
+    @owner.setter
+    def owner(self, value):
+        if not isinstance(value, User):
+            self._owner = value
+        else:
             raise ValueError("Owner IO must be in valid format")
-        
-    @property
-    def created_at(self):
-        return self._created_at
-        
-    @property
-    def updated_at(self):
-        return self.updated_at
-    
-    @updated_at.setter
-    def updated_at(self, value):
-        if not isinstance(value, datetime):
-            raise TypeError("Updated should be correct datetime object")
-        self._updated_at = value
-
-    @property
-    def reviews(self):
-        return self._reviews
-    
-    @reviews.setter
-    def reviews(self, value):
-        if not isinstance(value, list):
-            raise TypeError("Reviews must be a list")
-        self._reviews = value
-
-    @property
-    def amenities(self):
-        return self._amenities
-    
-    @amenities.setter
-    def amenities(self, value):
-        if not isinstance(value, list):
-            raise TypeError("Amenities must be a list")
-        self._amenities = value
+   
+    def save(self):
+        self.updated_at = datetime.now()
 
     def add_review(self, review):
         self.reviews.append(review)
-        self.updated_at = datetime.now()
+
 
     def add_amenity(self, amenity):
         if amenity not in self.amenities:
             self.amenities.append(amenity)
-            self.updated_at = datetime.now()
-    
-    
