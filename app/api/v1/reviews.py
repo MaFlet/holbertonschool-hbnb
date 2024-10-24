@@ -155,6 +155,6 @@ class PlaceReviewList(Resource):
                 'rating': review.rating, 
                 'user_id': str(review.user_id), 
                 'place_id': str(review.place_id),
-            } for review in reviews, 200
+            } for review in reviews], 200
         except Exception as e:
             return {'error': 'Internal server error', e}, 500
