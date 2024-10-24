@@ -1,4 +1,9 @@
 ## Objectives
+![image](https://github.com/user-attachments/assets/7d5ab82c-2d4b-4ef5-910f-f41a643e0a6c)
+![image (4)](https://github.com/user-attachments/assets/dde84bb4-78ad-4442-a0fb-7e153bd3e3ac)
+![image (2)](https://github.com/user-attachments/assets/65ce5a67-0c67-4535-96a2-aa0c7b6406a1)
+![image (1)](https://github.com/user-attachments/assets/4ed35e9f-b561-45a0-9787-b034623fd7cb)
+
 
 By the end of this project, you should be able to:
 
@@ -20,6 +25,7 @@ Use flask-restx to define and document the API, ensuring a clear and consistent 
 Implement data serialization to return extended attributes for related objects. For example, when retrieving a Place, the API should include details such as the owner’s first_name, last_name, and relevant amenities.
 
 - Test and Validate the API:
+
 
 Ensure that each endpoint works correctly and handles edge cases appropriately.
 Use tools like Postman or cURL to test your API endpoints.
