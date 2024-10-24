@@ -4,33 +4,12 @@ from app.services.facade import HBnBFacade
 api = Namespace('reviews', description='Review operations')
 
 # Define the review model for input validation and documentation
-user_model = api.model('User', {
-    'first_name': fields.String(required=True, description='First name of the user'),
-    'last_name': fields.String(required=True, description='Last name of the user'),
-    'email': fields.String(required=True, description='Email of the user')
-})
-
-amenity_model = api.model('Amenity', {
-    'name': fields.String(required=True, description='Name of the amenity')
-})
 
 review_model = api.model('Review', {
     'text': fields.String(required=True, description='Text of the review'),
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
     'user_id': fields.String(required=True, description='ID of the user'),
     'place_id': fields.String(required=True, description='ID of the place')
-})
-
-place_model = api.model('Place', {
-    'title': fields.String(required=True, description='Title of the place'),
-    'description': fields.String(description='Description of the place'),
-    'price': fields.Float(required=True, description='Price per night'),
-    'latitude': fields.Float(required=True, description='Latitude of the place'),
-    'longitude': fields.Float(required=True, description='Longitude of the place'),
-    'owner_id': fields.String(required=True, description='ID of the owner'),
-    'owner': fields.Nested(user_model, description='Owner of the place'),
-    'amenities': fields.List(fields.Nested(amenity_model), description='List of amenities'),
-    'reviews': fields.List(fields.Nested(review_model), description='List of reviews')
 })
 
 facade = HBnBFacade()
@@ -96,7 +75,7 @@ class ReviewResource(Resource):
                 'place_id': str(review.place_id),
             }, 200
         except Exception as e:
-            return {'error': 'Internal server error', e}, 500
+            return {'error': 'Internal server error'}, 500
     
     @api.expect(review_model)
     @api.response(200, 'Review updated successfully')
@@ -123,7 +102,7 @@ class ReviewResource(Resource):
         except ValueError as e:
             return {'error': str(e)}, 400
         except Exception as e:
-            return {'error': 'Internal server error', e}, 500
+            return {'error': 'Internal server error'}, 500
         
     @api.response(200, 'Review deleted successfully')
     @api.response(404, 'Review not found')
@@ -157,4 +136,4 @@ class PlaceReviewList(Resource):
                 'place_id': str(review.place_id),
             } for review in reviews], 200
         except Exception as e:
-            return {'error': 'Internal server error', e}, 500
+            return {'error': 'Internal server error'}, 500

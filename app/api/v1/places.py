@@ -17,10 +17,10 @@ user_model = api.model('PlaceUser', {
 })
 
 review_model = api.model('Review', {
+    'id': fields.String(description='Review ID'),
     'text': fields.String(required=True, description='Text of the review'),
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
     'user_id': fields.String(required=True, description='ID of the user'),
-    'place_id': fields.String(required=True, description='ID of the place')
 })
 
 # Define the place model for input validation and documentation
@@ -31,8 +31,9 @@ place_model = api.model('Place', {
     'latitude': fields.Float(required=True, description='Latitude of the place'),
     'longitude': fields.Float(required=True, description='Longitude of the place'),
     'owner_id': fields.String(required=True, description='ID of the owner'),
-    'owner': fields.Nested(user_model, description='Owner details'),
-    'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
+    'owner': fields.Nested(user_model, description='Owner of the place'),
+    'amenities': fields.List(fields.Nested(amenity_model), description='List of amenities'),
+    'reviews': fields.List(fields.Nested(review_model), description='List of reviews')
 })
 
 facade = HBnBFacade()
