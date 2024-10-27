@@ -12,3 +12,5 @@ class User():
         self.updated_at = datetime.now()
         self.places = []
         self.reviews = []
+
+    
