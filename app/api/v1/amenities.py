@@ -20,14 +20,17 @@ class AmenityList(Resource):
         """Register a new amenity"""
         amenity_data = api.payload
         new_amenity = facade.create_amenity(amenity_data)
-        return {'id': new_amenity.id, 'name': new_amenity.name}
+        return {
+            'id': str(new_amenity.id), 
+            'name': new_amenity.name
+        }
 
     @api.response(200, 'List of amenities retrieved successfully')
     def get(self):
         """Retrieve a list of all amenities"""
         amenity_list = facade.get_all_amenities()
         return [{
-            'id': amenity.id,
+            'id': str(amenity.id),
             'name': amenity.name
         } for amenity in amenity_list], 200
 
@@ -62,3 +65,7 @@ class AmenityResource(Resource):
             'id': str(updated_amenity.id),
             'name': updated_amenity.name
         }, 200
+
+ # curl -X POST "http://127.0.0.1:5000/api/v1/amenities/" -H "Content-Type: application/json" -d '{"name": "Wi-fi"}'
+ # curl -X GET "http://127.0.0.1:5000/api/v1/amenities/" -H "Content-Type: application/json"
+ # curl -X GET "http://127.0.0.1:5000/api/v1/amenities/<amenity_id>
