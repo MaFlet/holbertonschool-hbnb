@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from app.models.user import User
 
 class Place():
     """ """
@@ -36,7 +37,7 @@ class Place():
     def description(self, value):
         if not isinstance(value, str):
             raise TypeError("Description must be string")
-        if not 0 < len(value.strip() <= 1000):
+        if not 0 < len(value.strip()) <= 1000:
             raise ValueError("Description must be between 1 - 1000 characters in length")
         self._description = value.strip()
 
@@ -53,7 +54,7 @@ class Place():
             self._price = float_value
         except (TypeError, ValueError) as e:
             if isinstance(e, TypeError) or str(e) != "Price cannot be negative":
-                raise ValueError("The price must be a valid number", e)
+                raise ValueError("The price must be a valid number") from e
             raise
 
     @property
@@ -82,17 +83,23 @@ class Place():
 
     @property
     def owner(self):
-        return self._owner_id
+        return self._owner
     
     @owner.setter
     def owner(self, value):
-        if not isinstance(value, User):
+        if isinstance(value, User):
             self._owner = value
         else:
-            raise ValueError("Owner IO must be in valid format")
+            raise ValueError("Owner ID must be in valid format")
    
     def save(self):
         self.updated_at = datetime.now()
+
+    def update(self, data):
+        for key, value in data.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+        self.save()
 
     def add_review(self, review):
         self.reviews.append(review)
