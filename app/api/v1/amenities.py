@@ -66,6 +66,8 @@ class AmenityResource(Resource):
             'name': updated_amenity.name
         }, 200
 
+ # Please use these Curl command tests for testing the endpoints for amenities.
  # curl -X POST "http://127.0.0.1:5000/api/v1/amenities/" -H "Content-Type: application/json" -d '{"name": "Wi-fi"}'
  # curl -X GET "http://127.0.0.1:5000/api/v1/amenities/" -H "Content-Type: application/json"
- # curl -X GET "http://127.0.0.1:5000/api/v1/amenities/<amenity_id>
+ # curl -X GET "http://127.0.0.1:5000/api/v1/amenities/<amenity_id>"
+ # curl -X PUT "http://127.0.0.1:5000/api/v1/amenities/<amenity_id>" -H "Content-Type: application/json" -d '{"name": "Air conditioning"}'
