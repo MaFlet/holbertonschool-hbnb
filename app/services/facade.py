@@ -12,6 +12,12 @@ class HBnBFacade:
         self.place_repo = InMemoryRepository()
         self.review_repo = InMemoryRepository()
 
+    def _validate_uuid(self, uuid_string):
+        try:
+            return str(UUID(uuid_string, version=4))
+        except (ValueError, AttributeError, TypeError):
+            return None
+
 
     ###
     ###USER
@@ -22,6 +28,9 @@ class HBnBFacade:
         return user
     
     def get_user(self, user_id):
+        valid_uuid = self._validate_uuid(user_id)
+        if not valid_uuid:
+            return None
         return self.user_repo.get(user_id)
     
     def get_all_user(self):
@@ -65,16 +74,27 @@ class HBnBFacade:
     ###
 
     def create_place(self, place_data):
-        owner_id = place_data.get('owner_id')
-        if not self.get_user(owner_id):
-            raise ValueError(f'Invalid ownwe_id: {owner_id}')
+        if 'owner' in place_data:
+            owner = place_data['owner']
+            owner_id = str(owner.id)
+        else:
+            owner_id = place_data.get('owner_id')
+            if not self._validate_uuid(owner_id):
+                raise ValueError(f'Invalid ownwe_id format: {owner_id}')
+            owner = self.get_user(owner_id)
+            if not owner:
+                raise ValueError(f'Owner not found with id: {owner_id}')
+            place_data['owner'] = owner
         
-        if 'amenities' in place_data:
+        if 'amenities' in place_data and isinstance(place_data['amenities'], list):
             valid_amenities = []
             for amenity_id in place_data['amenities']:
-                amenity = self.get_amenity(amenity_id)
+                valid_uuid = self._validate_uuid(amenity_id)
+                if not valid_uuid:
+                    raise ValueError(f'Invalid amenity_id format: {amenity_id}')
+                amenity = self.get_amenity(valid_uuid)
                 if not amenity:
-                    raise ValueError(f'Invalid amenity_id: {amenity_id}')
+                    raise ValueError(f'Amenity not found with id: {amenity_id}')
                 valid_amenities.append(amenity)
             place_data['amenities'] = valid_amenities
 
@@ -89,18 +109,29 @@ class HBnBFacade:
         return list(self.place_repo.get_all())
 
     def update_place(self, place_id, place_data):
-        place = self.get_place(place_id)
+        valid_uuid = self._validate_uuid(place_id)
+        if not valid_uuid:
+            raise ValueError(f"Invalid place_id format: {place_id}")
+        
+        place = self.get_place(valid_uuid)
         if place is None:
             raise ValueError(f"Place with ID {place_id} not found")
     
         if 'owner_id' in place_data:
-            owner = self.get_user(place_data['owner_id'])
-            if owner is None:
-                raise ValueError(f"Invalid owner_id: {place_id['owner_id']}")
+            owner_id = place_data['owner_id']
+            if not self._validate_uuid(owner_id):
+                raise ValueError(f"Invalid owner_id format: {owner_id}")
+            owner = self.get_user(owner_id)
+            if not owner:
+                raise ValueError(f"Invalid owner: {owner_id}")
+            place_data['owner'] = owner
             
         if 'amenities' in place_data:
             valid_amenities = []
             for amenity_id in place_data['amenities']:
+                valid_uuid = self._validate_uuid(amenity_id)
+                if not valid_uuid:
+                    raise ValueError(f"Invalid amenity_id format: {amenity_id}")
                 amenity = self.get_amenity(amenity_id)
                 if not amenity:
                     raise ValueError(f"Invalid amenity_id: {amenity_id}")
