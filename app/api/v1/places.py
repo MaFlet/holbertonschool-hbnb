@@ -40,15 +40,6 @@ place_model = api.model('Place', {
 
 facade = HBnBFacade()
 
-def validate_uuid(uuid_string):
-    """Validate UUID format for ID's"""
-    try:
-        uuid_obj = UUID(uuid_string, version=4)
-        return str(uuid_obj)
-    except (ValueError, AttributeError, TypeError):
-        print(f"Invalid UUID format: {uuid_string}")
-        return None
-
 @api.route('/')
 class PlaceList(Resource):
     @api.expect(place_model)
@@ -58,52 +49,27 @@ class PlaceList(Resource):
     def post(self):
         """Register a new place"""
         place_data = api.payload
-        print(f"Receiving place data: {place_data}")
         
         required_fields = ['title', 'description', 'price', 'latitude', 'longitude', 'owner_id']
         if not all(field in place_data for field in required_fields):
             missing_fields = [field for field in required_fields if field not in place_data]
             print(f"Missing fields: {missing_fields}")
             return {'error': "Data: invalid input"}, 400
-        
-        owner_id = place_data.get('owner_id')
-        valid_uuid = validate_uuid(owner_id) # validate owner_id format
-        if not valid_uuid:
-            return {'error': "Invalid owner ID format"}, 400
-        
-        user = facade.get_user(valid_uuid)
-        print(f"Looking up user with ID: {valid_uuid}")
-        if not user:
-            print(f"User not found with ID: {valid_uuid}")
-            return {'error': "User does not exist"}, 400
-        
         try:
-            place_data['price'] = float(place_data['price'])
-            place_data['latitude'] = float(place_data['latitude'])
-            place_data['longitude'] = float(place_data['longitude'])
-
-            place_data['owner'] = user
-            del place_data['owner_id']
-
             new_place = facade.create_place(place_data)
+        except ValueError as e:
+            return {'error': str(e)}, 404
         
-            result = { 
-                'id': str(new_place.id),
-                'title': new_place.title, 
-                'description': new_place.description, 
-                'price': new_place.price, 
-                'latitude': new_place.latitude, 
-                'longitude': new_place.longitude, 
-                'owner_id': str(new_place.owner.id) 
-                }
-            return result, 201
-        
-        except ValueError as error:
-            print(f"Validation error: {str(error)}")
-            return {'error': f"Setter validation failure: {str(error)}"}, 400
-        except Exception as error:
-            print(f"Unexpected error: {str(error)}")
-            return {'error': "An unexpected error occurred"}, 500
+        result = { 
+            'id': str(new_place.id),
+            'title': new_place.title, 
+            'description': new_place.description, 
+            'price': new_place.price, 
+            'latitude': new_place.latitude, 
+            'longitude': new_place.longitude, 
+            'owner_id': str(new_place.owner.id) 
+            }
+        return result, 201
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
@@ -126,12 +92,8 @@ class PlaceResource(Resource):
     @api.response(404, 'Place not found')
     def get(self, place_id):
         """Get place details by ID"""
-        valid_uuid = validate_uuid(place_id)
-        if not valid_uuid:
-            return {'error': 'Invalid place ID format'}, 400
-        
         try:
-            place = facade.get_place(valid_uuid)
+            place = facade.get_place(place_id)
             if not place:
                 return{'error': 'Place not found'}, 404
             if not place.owner:
@@ -166,10 +128,6 @@ class PlaceResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
         """Update a place's information"""
-        valid_uuid = validate_uuid(place_id)
-        if not valid_uuid:
-            return {'error': 'Invalid place ID format'}, 400
-        
         place_data = api.payload
         required_fields = {'title', 'description', 'price'}
 
@@ -177,21 +135,19 @@ class PlaceResource(Resource):
             return {'error': 'Attributes are missing - Invalid data'}, 400
         
         try:
-            if not facade.get_place(place_id):
-                return {'error': 'Place not found'}, 404
-            
-            place_data['price'] = float(place_data['price'])
-            
-            facade.update_place(valid_uuid, place_data)
+            requesting_user_id = get_current_user_id()
+            facade.update_place(place_id, place_data, requesting_user_id)
             return {'message': 'Place updated successfully'}, 200
         except ValueError as error:
-                return {'error': f"Setter validation failure: {str(error)}"}, 400
+                if "Only the owner" in str(error):
+                    return {'error': str(error)}, 403
+                return {'error': f"Validation failure: {str(error)}"}, 400
         except Exception as error:
             print(f"Error updating place: {str(error)}")
             return {'error': 'Failed to update place'}, 500
 
 # Please use these Curl command tests for testing the endpoints for amenities.
- # curl -X POST "http://127.0.0.1:5000/api/v1/places/" -H "Content-Type: application/json" -d '{"title": "Wi-fi", "description": "A nice place to stay", "price": "100.0", "latitude": "37.37749", "longitude": "-122.4194", "owner_id": ""}'
+ # curl -X POST "http://127.0.0.1:5000/api/v1/places/" -H "Content-Type: application/json" -d '{"title": "Apartment", "description": "A nice place to stay", "price": "100.0", "latitude": "37.37749", "longitude": "-122.4194", "owner_id": ""}'
  # curl -X GET "http://127.0.0.1:5000/api/v1/places/" -H "Content-Type: application/json"
  # curl -X GET "http://127.0.0.1:5000/api/v1/places/<place_id>"
  # curl -X PUT "http://127.0.0.1:5000/api/v1/places/<place_id>" -H "Content-Type: application/json" -d '{"title": "Luxury Condo", "description": "An upscale place to stay", "price": "200.0"}'
