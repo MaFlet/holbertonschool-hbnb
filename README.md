@@ -39,3 +39,7 @@ Use tools like Postman or cURL to test your API endpoints.
 1. config.py will be used for configuring environment variables and application settings.
 1. requirements.txt will list all the Python packages needed for the project.
 1. README.md will contain a brief overview of the project.
+
+How to test with pytest
+export PYTHONPATH=$(pwd)/app
+pytest tests/test_review.py
