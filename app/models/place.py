@@ -4,14 +4,14 @@ from app.models.user import User
 
 class Place():
     """ """
-    def __init__(self, title, description, price, latitude, longitude, owner, amenities=None):
+    def __init__(self, title, description, price, latitude, longitude, owner_id, amenities=None):
         self.id = str(uuid.uuid4())
         self.title = title
         self.description = description
         self.price = price
         self.latitude = latitude
-        self.longtitude = longitude
-        self.owner = owner
+        self.longitude = longitude
+        self.owner_id = owner_id
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
         self.reviews = []
@@ -82,15 +82,14 @@ class Place():
         self._longitude = float(value)
 
     @property
-    def owner(self):
-        return self._owner
+    def owner_id(self):
+        return self._owner_id
     
-    @owner.setter
-    def owner(self, value):
-        if isinstance(value, User):
-            self._owner = value
-        else:
-            raise ValueError("Owner ID must be in valid format")
+    @owner_id.setter
+    def owner_id(self, value):
+        if not value:
+            raise ValueError("Owner ID cannot be found")
+        self._owner_id = str(value)
    
     def save(self):
         self.updated_at = datetime.now()
