@@ -20,7 +20,8 @@ class HBnBFacade:
         return user
     
     def get_user(self, user_id):
-        return self.user_repo.get(user_id)
+        str_id = str(user_id)
+        return self.user_repo.get(str_id)
     
     def get_all_user(self):
         return list(self.user_repo.get_all())
@@ -75,7 +76,7 @@ class HBnBFacade:
         if not owner_id:
             raise ValueError("Owner ID is required")
         
-        owner = self.get_user(owner_id)
+        owner = self.get_user(str(owner_id))
         if not owner:
             raise ValueError(f"Owner with ID {owner_id} not found")
         
