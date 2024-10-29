@@ -1,4 +1,3 @@
-from uuid import UUID
 from app.persistence.repository import InMemoryRepository
 from app.models.user import User
 from app.models.amenity import Amenity
@@ -12,12 +11,6 @@ class HBnBFacade:
         self.place_repo = InMemoryRepository()
         self.review_repo = InMemoryRepository()
 
-    def _validate_uuid(self, id_str):
-        try:
-            return str(uuid.UUID(str(id_str)))
-        except (ValueError, AttributeError, TypeError):
-            return None
-
     ###
     ###USER
     ###
@@ -27,22 +20,21 @@ class HBnBFacade:
         return user
     
     def get_user(self, user_id):
-        valid_uuid = self._validate_uuid(user_id)
-        if not valid_uuid:
-            print(f"Invalid UUID: {user_id}")
-            return None
-        
-        result = self.user_repo.get(valid_uuid)
-        if not result:
-            all_users = self.user_repo.get(valid_uuid)
-            print(f"User not found. Available users: {[str(u.id) for u in all_users]}")
-        return result
+        return self.user_repo.get(user_id)
     
     def get_all_user(self):
         return list(self.user_repo.get_all())
     
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
+    
+    def update_user(self, user_id, user_data):
+        user = self.get_user(user_id)
+        if not user:
+            return None
+        
+        self.user_repo.update(user_id, user_data)
+        return self.get_user(user_id)
     
     ###
     ###AMENITY
@@ -88,7 +80,6 @@ class HBnBFacade:
             raise ValueError(f"Owner with ID {owner_id} not found")
         
         place = Place(**place_data) # to create place with validated owner
-        owner.places.append(place)
         self.place_repo.add(place)
         return place
 

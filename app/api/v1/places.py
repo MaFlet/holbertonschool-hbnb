@@ -1,4 +1,3 @@
-from uuid import UUID
 from flask_restx import Namespace, Resource, fields
 from app.services.facade import HBnBFacade
 
@@ -49,16 +48,25 @@ class PlaceList(Resource):
     def post(self):
         """Register a new place"""
         place_data = api.payload
-        
         required_fields = ['title', 'description', 'price', 'latitude', 'longitude', 'owner_id']
+
         if not all(field in place_data for field in required_fields):
             missing_fields = [field for field in required_fields if field not in place_data]
             print(f"Missing fields: {missing_fields}")
             return {'error': "Data: invalid input"}, 400
+
+        user = facade.get_user(str(place_data.get('owner_id')))
+        if not user:
+            return {'error': "User does not exist"}, 400
+        
+        new_place = None
         try:
+            place_data['owner'] = user
+            del place_data['owner_id']
+
             new_place = facade.create_place(place_data)
-        except ValueError as e:
-            return {'error': str(e)}, 404
+        except ValueError as error:
+            return {'error': "Validation error: {}". format(error) }, 400
         
         result = { 
             'id': str(new_place.id),
